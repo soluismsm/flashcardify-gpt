@@ -3,12 +3,14 @@ import genanki
 import random
 import os
 
+START_RANGE = 1 << 30
+STOP_RANGE = 1 << 31
+
 # Put your API key here
 openai.api_key = os.getenv("OPENAI_API_KEY")
 model_id = "gpt-3.5-turbo"
 
 # Change the quantity of phrases or words you want to generate
-QUANT = 3
 
 
 def chat_completion(message):
@@ -20,15 +22,22 @@ def chat_completion(message):
 
 
 def format_reply(content):
-    reply = content.split("\n")
-    for i, v in enumerate(reply):
-        if "1)" in v:
-            reply[i] = v.replace(f"{i+1}) ", "")
-        else:
-            reply[i] = v.replace(f"{i+1}. ", "")
+    # [ ] todo: trocar o for loop por list comprehension
+    try:
+        reply = content.split("\n")
+        # reply = [v.replace(f"{i+1}) ", "") for i, v in enumerate(reply) if "1)" in v]
+        # reply = [v.replace(f"{i+1}. ", "") for i, v in enumerate(reply) if "1." in v]
+        # print(reply)
+        for i, v in enumerate(reply):
+            if "1)" in v:
+                reply[i] = v.replace(f"{i+1}) ", "")
+            else:
+                reply[i] = v.replace(f"{i+1}. ", "")
         card = reply[i].split("|")
         reply[i] = card
-    return reply
+        return reply
+    except Exception as e:
+        print(e)
 
 
 def create_note(model, card):
@@ -36,14 +45,14 @@ def create_note(model, card):
     return note
 
 
-def gen_id():
-    id = random.randrange(1 << 30, 1 << 31)
+def generate_deck_id():
+    id = random.randrange(START_RANGE, STOP_RANGE)
     return id
 
 
-def create_model(id=gen_id()):
+def create_model(deck_id):
     model = genanki.Model(
-        id,
+        deck_id,
         "Simple Model",
         fields=[
             {"name": "Question"},
@@ -60,17 +69,27 @@ def create_model(id=gen_id()):
     return model
 
 
+def create_deck(deck_id, deck_name="Frases Cotidianas em Espanhol", deck_quantity=50):
+    deck = genanki.Deck(deck_id, f"{deck_quantity} {deck_name}")
+    return deck
+
+
 def main():
     # Modify the deck name
-    deck_name = "Frases Cotidianas em Espanhol"
+    # [ ] todo: Mudar o deck_name padrão que create_deck() recebe
+    deck_name = input("Nome do Deck: ")
+    deck_quantity = int(
+        input("Digite a quantidade de Notas que gostaria de gerar (Padrão: 50): ")
+    )
     # Customize flashcard content
-    message = f"""Faça {QUANT} Flashcards com frases cotidianas em espanhol para
+    message = f"""Faça {deck_quantity} Flashcards com frases cotidianas em espanhol para
     português seguindo essa formatação: [concept] | [answer]."""
 
     content = chat_completion(message)
     reply = format_reply(content)
-    model = create_model()
-    deck = genanki.Deck(gen_id(), f"{QUANT} {deck_name}")
+    deck_id = generate_deck_id()
+    model = create_model(deck_id)
+    deck = create_deck(deck_id, deck_name, deck_quantity)
     for note in reply:
         note = create_note(model, note)
         deck.add_note(note)
