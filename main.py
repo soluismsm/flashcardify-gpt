@@ -1,14 +1,14 @@
 import openai
 import genanki
 import random
+import os
 
 # Put your API key here
-API_KEY = ""
-openai.api_key = API_KEY
+openai.api_key = os.getenv("OPENAI_API_KEY")
 model_id = "gpt-3.5-turbo"
 
 # Change the quantity of phrases or words you want to generate
-QUANT = 50
+QUANT = 3
 
 
 def chat_completion(message):
