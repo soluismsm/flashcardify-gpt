@@ -2,11 +2,13 @@ import openai
 import genanki
 import random
 
+# Put your API key here
 API_KEY = ""
 openai.api_key = API_KEY
-
-QUANT = 50
 model_id = "gpt-3.5-turbo"
+
+# Change the quantity of phrases or words you want to generate
+QUANT = 50
 
 
 def chat_completion(message):
@@ -59,14 +61,16 @@ def create_model(id=gen_id()):
 
 
 def main():
+    # Modify the deck name
+    deck_name = "Frases Cotidianas em Espanhol"
+    # Customize flashcard content
     message = f"""Faça {QUANT} Flashcards com frases cotidianas em espanhol para
     português seguindo essa formatação: [concept] | [answer]."""
 
     content = chat_completion(message)
-    print(content)
     reply = format_reply(content)
     model = create_model()
-    deck = genanki.Deck(gen_id(), f"{QUANT} Frases Cotidianas em Espanhol")
+    deck = genanki.Deck(gen_id(), f"{QUANT} {deck_name}")
     for note in reply:
         note = create_note(model, note)
         deck.add_note(note)
