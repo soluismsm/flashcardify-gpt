@@ -1,4 +1,4 @@
-# Flashcardify-AI
+# Flashcardify-GPT
 
 Flashcardify-AI is a Python project that uses the OpenAI API and the Genanki library to generate customizable Anki Flashcards.
 
