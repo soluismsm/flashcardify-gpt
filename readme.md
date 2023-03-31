@@ -15,7 +15,7 @@ To use Flashcardify-AI, you will need:
 
 1. Clone this repository to your computer.
 2. Install the dependencies with pip install -r requirements.txt.
-3. Replace the API_KEY variable at the beginning of main.py with your own OpenAI API key.
+3. Replace the API_KEY variable at the beginning of openai_helper.py with your own OpenAI API key.
 4. Run the script with 'python main.py'.
 5. The generated file will be saved in the root of the project with the name 'output.apkg'
 
